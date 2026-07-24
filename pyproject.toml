@@ -32,6 +32,15 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+# Test-only deps (no lint tools) — used by the CI test matrix so EOL
+# interpreters (3.8/3.9) don't try to install ruff/mypy, which need >=3.10.
+test = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "responses>=0.23.0",
+    "vcrpy>=4.2.0",
+    "python-dotenv>=1.0.0",
+]
 dev = [
     "pytest>=7.0.0",
     "pytest-cov>=4.0.0",
@@ -40,9 +49,10 @@ dev = [
     "python-dotenv>=1.0.0",
     "types-requests>=2.31.0",
     "types-python-dateutil>=2.8.0",
-    # Linting & type checking (keep in sync with .github/workflows/test.yml)
-    "ruff==0.16.0",
-    "mypy==2.3.0",
+    # Linting & type checking (keep in sync with .github/workflows/test.yml).
+    # Conditional: ruff/mypy 2.x require Python >= 3.10.
+    "ruff==0.16.0; python_version >= '3.10'",
+    "mypy==2.3.0; python_version >= '3.10'",
 ]
 
 [project.urls]
