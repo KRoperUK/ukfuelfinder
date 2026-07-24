@@ -8,11 +8,16 @@ from typing import Any, Dict, Optional
 import requests
 
 from .auth import OAuth2Authenticator
-from .exceptions import BatchNotFoundError
+from .exceptions import (
+    BatchNotFoundError,
+    NotFoundError,
+    RateLimitError,
+    ResponseParseError,
+    ServerError,
+    ValidationError,
+)
 from .exceptions import ConnectionError as FuelFinderConnectionError
-from .exceptions import NotFoundError, RateLimitError, ResponseParseError, ServerError
 from .exceptions import TimeoutError as FuelFinderTimeoutError
-from .exceptions import ValidationError
 from .rate_limiter import RateLimiter
 
 logger = logging.getLogger(__name__)
@@ -68,15 +73,15 @@ class HTTPClient:
                     continue
                 raise
 
-            except requests.Timeout:
+            except requests.Timeout as e:
                 if attempt < retries - 1:
                     continue
-                raise FuelFinderTimeoutError(f"Request to {url} timed out")
+                raise FuelFinderTimeoutError(f"Request to {url} timed out") from e
 
             except requests.ConnectionError as e:
                 if attempt < retries - 1:
                     continue
-                raise FuelFinderConnectionError(f"Connection to {url} failed: {e}")
+                raise FuelFinderConnectionError(f"Connection to {url} failed: {e}") from e
 
         raise ServerError("Max retries exceeded")
 
@@ -96,7 +101,7 @@ class HTTPClient:
                     return data.get("data", data)
                 return data
             except ValueError as e:
-                raise ResponseParseError(f"Failed to parse JSON response: {e}")
+                raise ResponseParseError(f"Failed to parse JSON response: {e}") from e
 
         elif response.status_code == 400:
             raise ValidationError(f"Invalid request: {response.text}")

@@ -1,18 +1,16 @@
 """
 Error handling example for UK Fuel Finder API
 """
+
 from ukfuelfinder import FuelFinderClient
 from ukfuelfinder.exceptions import (
     AuthenticationError,
     RateLimitError,
-    TimeoutError,
     ServerError,
+    TimeoutError,
 )
 
-client = FuelFinderClient(
-    client_id="your_client_id",
-    client_secret="your_client_secret"
-)
+client = FuelFinderClient(client_id="your_client_id", client_secret="your_client_secret")
 
 # Handle authentication errors
 try:
@@ -34,7 +32,7 @@ try:
     client_with_short_timeout = FuelFinderClient(
         client_id="your_client_id",
         client_secret="your_client_secret",
-        timeout=1  # 1 second
+        timeout=1,  # 1 second
     )
     prices = client_with_short_timeout.get_all_pfs_prices()
 except TimeoutError as e:

@@ -2,6 +2,8 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![Test](https://github.com/KRoperUK/ukfuelfinder/actions/workflows/test.yml/badge.svg)](https://github.com/KRoperUK/ukfuelfinder/actions/workflows/test.yml)
+[![codecov](https://codecov.io/gh/KRoperUK/ukfuelfinder/branch/main/graph/badge.svg)](https://codecov.io/gh/KRoperUK/ukfuelfinder)
 
 Python library for accessing the UK Government Fuel Finder API.
 
@@ -196,7 +198,7 @@ if prices[0].fuel_prices:
 ### Setup
 
 ```bash
-git clone https://github.com/mretallack/ukfuelfinder.git
+git clone https://github.com/KRoperUK/ukfuelfinder.git
 cd ukfuelfinder
 pip install -e .[dev]
 ```
@@ -210,9 +212,9 @@ pytest
 ### Code Quality
 
 ```bash
-black ukfuelfinder tests
-mypy ukfuelfinder
-flake8 ukfuelfinder
+ruff check ukfuelfinder tests
+ruff format --check ukfuelfinder tests
+mypy
 ```
 
 ## Future Enhancements
@@ -267,7 +269,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Support
 
-- **Issues**: [GitHub Issues](https://github.com/mretallack/ukfuelfinder/issues)
+- **Issues**: [GitHub Issues](https://github.com/KRoperUK/ukfuelfinder/issues)
 - **API Support**: [Contact Fuel Finder Team](https://www.developer.fuel-finder.service.gov.uk/contact-us)
 
 ## Changelog
@@ -275,29 +277,15 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 See [CHANGELOG.md](CHANGELOG.md) for version history.
 ## Release Procedure
 
-To create a new release:
+Releases are automated with [release-please](https://github.com/googleapis/release-please):
 
-1. **Update version** in all files:
-   - `pyproject.toml`
-   - `setup.py` 
-   - `ukfuelfinder/__init__.py`
+1. **Merge changes to `main`** using [Conventional Commits](https://www.conventionalcommits.org/)
+   (`feat:`, `fix:`, `chore:` — these drive the version bump and changelog).
+2. **release-please maintains a release PR** that bumps the version in
+   `pyproject.toml` and `ukfuelfinder/__init__.py`, and updates `CHANGELOG.md`.
+3. **Merge the release PR** — the git tag and GitHub release are created, and the
+   distributions are built and published to PyPI via trusted publishing
+   (`.github/workflows/release-please.yml`).
 
-2. **Update CHANGELOG.md** with new version entry
-
-3. **Commit and push** version updates:
-   ```bash
-   git add pyproject.toml setup.py ukfuelfinder/__init__.py CHANGELOG.md
-   git commit -m "Release: vX.Y.Z"
-   git push origin main
-   ```
-
-4. **Create GitHub release**:
-   - Go to GitHub repository → Releases → Create new release
-   - Tag: `vX.Y.Z` (must match version in files)
-   - Title: `vX.Y.Z`
-   - Description: Copy from CHANGELOG.md for the version
-   - Publish release
-
-5. **Automated publishing**:
-   - GitHub Actions will automatically build and publish to PyPI
-   - Check `.github/workflows/publish.yml` for details
+Manual fallback: push a `v*` tag or run the "Publish to PyPI" workflow by hand
+(`.github/workflows/publish.yml`).

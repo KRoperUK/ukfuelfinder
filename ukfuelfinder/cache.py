@@ -6,7 +6,7 @@ import hashlib
 import json
 import threading
 import time
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Union
 
 
 class ResponseCache:
@@ -56,7 +56,7 @@ class ResponseCache:
 
         return hashlib.md5(key_str.encode()).hexdigest()
 
-    def get_stats(self) -> Dict[str, int]:
+    def get_stats(self) -> Dict[str, Union[int, float]]:
         """Get cache statistics."""
         with self._lock:
             total = self._hits + self._misses

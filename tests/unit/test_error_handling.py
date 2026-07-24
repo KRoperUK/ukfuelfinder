@@ -1,20 +1,21 @@
 """Unit tests for error handling."""
 
-import pytest
 from unittest.mock import Mock, patch
+
+import pytest
 import requests
 
-from ukfuelfinder.http_client import HTTPClient
 from ukfuelfinder.exceptions import (
     BatchNotFoundError,
-    NotFoundError,
-    ValidationError,
-    RateLimitError,
-    ServerError,
-    ResponseParseError,
-    TimeoutError,
     ConnectionError,
+    NotFoundError,
+    RateLimitError,
+    ResponseParseError,
+    ServerError,
+    TimeoutError,
+    ValidationError,
 )
+from ukfuelfinder.http_client import HTTPClient
 
 
 class TestErrorHandling:

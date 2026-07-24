@@ -6,7 +6,7 @@
 - [x] All 58 unit tests passing
 - [x] Test coverage at 74% (exceeds 65% requirement)
 - [x] No failing tests
-- [x] Code formatted with black
+- [x] Code formatted with ruff format
 - [x] Type hints verified
 
 ### Version Updates

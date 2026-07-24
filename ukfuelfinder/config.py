@@ -65,7 +65,11 @@ class Config:
         """Create configuration from environment variables."""
         client_id = os.getenv("FUEL_FINDER_CLIENT_ID")
         client_secret = os.getenv("FUEL_FINDER_CLIENT_SECRET")
-        env = environment or os.getenv("FUEL_FINDER_ENVIRONMENT", "production")
+        env = (
+            environment
+            if environment is not None
+            else os.getenv("FUEL_FINDER_ENVIRONMENT", "production")
+        )
 
         if not client_id or not client_secret:
             raise ValueError(

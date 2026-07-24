@@ -1,6 +1,5 @@
 """Mock tests for batch 404 error handling."""
 
-import pytest
 from ukfuelfinder.exceptions import BatchNotFoundError
 
 

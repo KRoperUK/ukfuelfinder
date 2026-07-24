@@ -84,45 +84,27 @@ pytest tests/integration/ # Integration tests only
 
 ### Code Quality
 ```bash
-black ukfuelfinder tests  # Format code
-mypy ukfuelfinder         # Type checking
-flake8 ukfuelfinder       # Linting
+ruff check ukfuelfinder tests    # Linting
+ruff format ukfuelfinder tests   # Format code
+mypy                             # Type checking
 ```
 
 ## Release Procedure
 
-### 1. Update Version
-Update version in all three files:
-- `pyproject.toml` → `version = "X.Y.Z"`
-- `setup.py` → `version="X.Y.Z"`
-- `ukfuelfinder/__init__.py` → `__version__ = "X.Y.Z"`
+Releases are automated by release-please (`.github/workflows/release-please.yml`):
 
-### 2. Update Changelog
-Add new version entry to `CHANGELOG.md` with:
-- Version number and date
-- Added features
-- Changed functionality
-- Fixed bugs
-- Breaking changes (if any)
+### 1. Merge to main with Conventional Commits
+`feat:` / `fix:` / `chore:` prefixes drive the version bump and changelog.
 
-### 3. Commit and Push
-```bash
-git add pyproject.toml setup.py ukfuelfinder/__init__.py CHANGELOG.md
-git commit -m "Release: vX.Y.Z"
-git push origin main
-```
+### 2. Release PR
+release-please maintains a PR that bumps `pyproject.toml` and
+`ukfuelfinder/__init__.py` (`__version__`) and updates `CHANGELOG.md`.
 
-### 4. Create GitHub Release
-1. Go to GitHub repository → Releases → Create new release
-2. Tag: `vX.Y.Z` (must match version in files)
-3. Title: `vX.Y.Z`
-4. Description: Copy from CHANGELOG.md for this version
-5. Publish release
+### 3. Merge the Release PR
+- Tag `vX.Y.Z` and the GitHub release are created automatically
+- Distributions are built and published to PyPI via trusted publishing
 
-### 5. Automated Publishing
-- GitHub Actions automatically builds and publishes to PyPI
-- Workflow: `.github/workflows/publish.yml`
-- Triggered by creating a new release tag
+Manual fallback: push a `v*` tag or run `.github/workflows/publish.yml` by hand.
 
 ## Configuration
 
@@ -192,9 +174,8 @@ client = FuelFinderClient()
 - `pytest>=7.0.0` - Testing framework
 - `pytest-cov>=4.0.0` - Coverage reporting
 - `responses>=0.23.0` - HTTP mocking
-- `black>=23.0.0` - Code formatting
-- `mypy>=1.0.0` - Type checking
-- `flake8>=6.0.0` - Linting
+- `ruff==0.16.0` - Linting and formatting
+- `mypy==2.3.0` - Type checking
 
 ## Future Enhancements
 

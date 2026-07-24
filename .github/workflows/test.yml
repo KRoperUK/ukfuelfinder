@@ -1,0 +1,90 @@
+name: Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+
+      - name: Install ruff
+        # Pinned to match the [dev] extra (pyproject.toml) so lint/format can't
+        # drift between local runs and CI. Bump both together.
+        run: pip install ruff==0.16.0
+
+      - name: Lint with ruff
+        # --output-format=github emits ::error annotations inline on the
+        # offending lines in the PR "Files changed" view.
+        run: ruff check --output-format=github ukfuelfinder/ tests/ examples/
+
+      - name: Check formatting
+        run: ruff format --check ukfuelfinder/ tests/ examples/
+
+      - name: Install mypy
+        # Pinned for reproducible type checks (a new mypy release can't change
+        # results without a deliberate bump). Matches the [dev] extra.
+        run: pip install -e . mypy==2.3.0 types-requests types-python-dateutil
+
+      - name: Type check with mypy
+        run: mypy
+
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        # Matches requires-python (>=3.8); allow-prereleases lets the newest
+        # interpreter track upcoming releases early.
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        with:
+          python-version: ${{ matrix.python-version }}
+          allow-prereleases: true
+          cache: pip
+          cache-dependency-path: pyproject.toml
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e '.[dev]'
+
+      - name: Run tests with coverage
+        # fail_under (pyproject [tool.coverage.report]) is enforced here by
+        # pytest-cov. Integration tests (live API) are deselected by default.
+        run: pytest --cov-report=xml
+
+      # Upload coverage from a single matrix leg to avoid double-reporting.
+      # Needs a CODECOV_TOKEN secret to report, but never fails CI without one
+      # (fail_ci_if_error: false).
+      - name: Upload coverage to Codecov
+        if: ${{ matrix.python-version == '3.13' && !cancelled() }}
+        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: coverage.xml
+          fail_ci_if_error: false
