@@ -56,7 +56,7 @@ jobs:
     environment:
       name: pypi
       # Must match the PyPI project a Trusted Publisher is configured for.
-      url: https://pypi.org/p/ukfuelfinder
+      url: https://pypi.org/p/ukfuelfinder-kroper
     permissions:
       id-token: write
     steps:

@@ -85,7 +85,7 @@ else:
 ## Installation
 
 ```bash
-pip install ukfuelfinder
+pip install ukfuelfinder-kroper
 ```
 
 ## Quick Start

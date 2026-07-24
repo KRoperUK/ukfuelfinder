@@ -3,7 +3,9 @@ requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "ukfuelfinder"
+# Published on PyPI as "ukfuelfinder-kroper" (the upstream project owns
+# "ukfuelfinder"); the import package stays `ukfuelfinder`.
+name = "ukfuelfinder-kroper"
 version = "3.0.0"
 description = "Python library for accessing the UK Government Fuel Finder API (KRoperUK fork)"
 readme = "README.md"

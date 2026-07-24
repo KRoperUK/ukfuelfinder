@@ -126,7 +126,7 @@ python3 -m twine upload dist/*
 
 ### 7. Post-Release
 - [ ] Verify PyPI page updated
-- [ ] Test installation: `pip install ukfuelfinder`
+- [ ] Test installation: `pip install ukfuelfinder-kroper`
 - [ ] Verify documentation renders correctly
 - [ ] Update any external documentation
 - [ ] Announce release (if applicable)
