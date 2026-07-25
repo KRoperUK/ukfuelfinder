@@ -6,7 +6,7 @@
 - [x] All 58 unit tests passing
 - [x] Test coverage at 74% (exceeds 65% requirement)
 - [x] No failing tests
-- [x] Code formatted with black
+- [x] Code formatted with ruff format
 - [x] Type hints verified
 
 ### Version Updates
@@ -126,7 +126,7 @@ python3 -m twine upload dist/*
 
 ### 7. Post-Release
 - [ ] Verify PyPI page updated
-- [ ] Test installation: `pip install ukfuelfinder`
+- [ ] Test installation: `pip install ukfuelfinder-kroper`
 - [ ] Verify documentation renders correctly
 - [ ] Update any external documentation
 - [ ] Announce release (if applicable)

@@ -1,14 +1,10 @@
 """Test for stations that exist but have no price data."""
 
-import os
-
 import pytest
-
-from ukfuelfinder import FuelFinderClient
 
 
 @pytest.mark.integration
-def test_murco_wool_station_has_prices():
+def test_murco_wool_station_has_prices(real_client):
     """Test that Murco-Wool station in Wool, Dorset has price data.
 
     This test documents a known issue where some stations exist in the
@@ -18,11 +14,7 @@ def test_murco_wool_station_has_prices():
     Location: Wool, Dorset (50.6833, -2.2167)
     Node ID: c068821c665146c482d8ea34f3879efbab64ac2a7865a8f9a80014c29450ce91
     """
-    client = FuelFinderClient(
-        client_id=os.getenv("FUEL_FINDER_CLIENT_ID"),
-        client_secret=os.getenv("FUEL_FINDER_CLIENT_SECRET"),
-        timeout=60,
-    )
+    client = real_client
 
     # Search near Wool, Dorset
     lat, lon = 50.6833, -2.2167
@@ -32,7 +24,7 @@ def test_murco_wool_station_has_prices():
 
     # Find Murco-Wool station
     murco_station = None
-    for distance, station in nearby_stations:
+    for _distance, station in nearby_stations:
         if "murco" in station.brand_name.lower() and "wool" in station.brand_name.lower():
             murco_station = station
             break
@@ -63,9 +55,9 @@ def test_murco_wool_station_has_prices():
     # If we get here, check that it has actual prices
     prices_with_values = [fp for fp in station_prices.fuel_prices if fp.price is not None]
 
-    assert (
-        len(prices_with_values) > 0
-    ), f"Station {murco_station.trading_name} has price records but all prices are None"
+    assert len(prices_with_values) > 0, (
+        f"Station {murco_station.trading_name} has price records but all prices are None"
+    )
 
     print(f"\n✅ Station has {len(prices_with_values)} prices:")
     for fp in prices_with_values:

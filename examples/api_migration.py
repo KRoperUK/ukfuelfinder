@@ -15,7 +15,7 @@ print("=" * 60)
 client_old = FuelFinderClient(
     client_id="your_client_id",
     client_secret="your_client_secret",
-    backward_compatible=True  # This is the default
+    backward_compatible=True,  # This is the default
 )
 
 pfs_list = client_old.get_all_pfs_prices(batch_number=1)
@@ -24,9 +24,9 @@ if pfs_list:
     print(f"\nStation: {pfs.trading_name}")
     print(f"Has 'success' field: {hasattr(pfs, 'success')}")  # True
     print(f"Has 'message' field: {hasattr(pfs, 'message')}")  # True
-    if hasattr(pfs, 'success'):
+    if hasattr(pfs, "success"):
         print(f"Success value: {pfs.success}")  # Always True
-    if hasattr(pfs, 'message'):
+    if hasattr(pfs, "message"):
         print(f"Message value: '{pfs.message}'")  # Always empty string
 
 print("\n" + "=" * 60)
@@ -35,9 +35,7 @@ print("=" * 60)
 
 # New API usage - no backward compatibility
 client_new = FuelFinderClient(
-    client_id="your_client_id",
-    client_secret="your_client_secret",
-    backward_compatible=False
+    client_id="your_client_id", client_secret="your_client_secret", backward_compatible=False
 )
 
 pfs_list = client_new.get_all_pfs_prices(batch_number=1)
@@ -46,13 +44,13 @@ if pfs_list:
     print(f"\nStation: {pfs.trading_name}")
     print(f"Has 'success' field: {hasattr(pfs, 'success')}")  # False
     print(f"Has 'message' field: {hasattr(pfs, 'message')}")  # False
-    
+
     # New field available
     if pfs.fuel_prices:
         price = pfs.fuel_prices[0]
         print(f"\nFuel: {price.fuel_type}")
-        print(f"Price: £{price.price/100:.2f}")
-        if hasattr(price, 'price_change_effective_timestamp'):
+        print(f"Price: £{price.price / 100:.2f}")
+        if hasattr(price, "price_change_effective_timestamp"):
             print(f"Effective timestamp: {price.price_change_effective_timestamp}")
 
 print("\n" + "=" * 60)

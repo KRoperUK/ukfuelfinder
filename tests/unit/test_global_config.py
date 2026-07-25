@@ -1,9 +1,11 @@
 """Tests for global configuration."""
 
 import os
+
 import pytest
+
 from ukfuelfinder import FuelFinderClient, set_global_backward_compatible
-from ukfuelfinder.config import get_global_backward_compatible, _global_backward_compatible
+from ukfuelfinder.config import get_global_backward_compatible
 
 
 @pytest.fixture(autouse=True)
@@ -40,7 +42,9 @@ def test_global_config_overrides_parameter():
     set_global_backward_compatible(False)
 
     client = FuelFinderClient(
-        client_id="test", client_secret="test", backward_compatible=True  # Should be overridden
+        client_id="test",
+        client_secret="test",
+        backward_compatible=True,  # Should be overridden
     )
 
     assert client.backward_compatible is False
@@ -61,7 +65,9 @@ def test_env_var_overrides_parameter():
     os.environ["UKFUELFINDER_BACKWARD_COMPATIBLE"] = "false"
 
     client = FuelFinderClient(
-        client_id="test", client_secret="test", backward_compatible=True  # Should be overridden
+        client_id="test",
+        client_secret="test",
+        backward_compatible=True,  # Should be overridden
     )
 
     assert client.backward_compatible is False

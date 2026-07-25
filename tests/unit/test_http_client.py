@@ -1,8 +1,9 @@
 """Tests for HTTP client."""
 
-import pytest
 from unittest.mock import Mock, patch
-from ukfuelfinder.http_client import HTTPClient
+
+import pytest
+
 from ukfuelfinder.exceptions import (
     BatchNotFoundError,
     NotFoundError,
@@ -11,6 +12,7 @@ from ukfuelfinder.exceptions import (
     ServerError,
     ValidationError,
 )
+from ukfuelfinder.http_client import HTTPClient
 
 
 @pytest.fixture

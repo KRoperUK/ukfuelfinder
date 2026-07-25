@@ -1,32 +1,71 @@
 name: Publish to PyPI
 
 on:
-  release:
-    types: [published]
+  # Manual / backup path. Automated releases publish from release-please.yml
+  # (PyPI Trusted Publishing can't be driven through a reusable workflow, so the
+  # build/publish steps are inlined there rather than reused from here).
+  # Pushing a v* tag directly, or running this workflow manually, also publishes.
+  workflow_dispatch: {}
+  push:
+    tags:
+      - "v*"
 
 permissions:
-  id-token: write
   contents: read
 
 jobs:
-  publish:
+  test:
     runs-on: ubuntu-latest
-    
+    timeout-minutes: 15
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.11'
-    
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install build
-    
-    - name: Build package
-      run: python -m build
-    
-    - name: Publish to PyPI
-      uses: pypa/gh-action-pypi-publish@release/v1
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        with:
+          python-version: "3.13"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e '.[test]'
+      - name: Run tests
+        run: pytest
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        with:
+          python-version: "3.13"
+      - name: Install build tools
+        run: python -m pip install --upgrade pip build
+      - name: Build distributions
+        run: python -m build
+      - name: Upload distributions
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: release-dists
+          path: dist/
+
+  pypi-publish:
+    name: Publish release to PyPI
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: pypi
+      # Must match the PyPI project a Trusted Publisher is configured for.
+      url: https://pypi.org/p/ukfuelfinder-kroper
+    permissions:
+      id-token: write
+    steps:
+      - name: Retrieve release distributions
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: release-dists
+          path: dist/
+      - name: Publish release distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@cef221092ed1bacb1cc03d23a2d87d1d172e277b # v1.14.0
+        with:
+          packages-dir: dist/

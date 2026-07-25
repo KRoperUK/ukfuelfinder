@@ -4,7 +4,7 @@ from datetime import datetime
 
 import pytest
 
-from ukfuelfinder.models import PFS, FuelPrice, Location, PFSInfo, Address
+from ukfuelfinder.models import PFS, Address, FuelPrice, Location, PFSInfo
 
 
 @pytest.mark.unit

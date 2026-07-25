@@ -64,10 +64,7 @@ class OAuth2Authenticator:
             data = response.json()
 
             # Handle nested response structure
-            if "data" in data:
-                token_data = data["data"]
-            else:
-                token_data = data
+            token_data = data.get("data", data)
 
             self._access_token = token_data["access_token"]
             self._refresh_token = token_data.get("refresh_token")
@@ -76,7 +73,7 @@ class OAuth2Authenticator:
             return self._access_token
 
         except requests.RequestException as e:
-            raise AuthenticationError(f"Failed to generate access token: {e}")
+            raise AuthenticationError(f"Failed to generate access token: {e}") from e
 
     def _refresh_access_token(self) -> str:
         """Refresh access token using refresh token."""
@@ -98,10 +95,7 @@ class OAuth2Authenticator:
             data = response.json()
 
             # Handle nested response structure
-            if "data" in data:
-                token_data = data["data"]
-            else:
-                token_data = data
+            token_data = data.get("data", data)
 
             self._access_token = token_data["access_token"]
             self._refresh_token = token_data.get("refresh_token", self._refresh_token)
@@ -110,4 +104,4 @@ class OAuth2Authenticator:
             return self._access_token
 
         except requests.RequestException as e:
-            raise AuthenticationError(f"Failed to refresh access token: {e}")
+            raise AuthenticationError(f"Failed to refresh access token: {e}") from e

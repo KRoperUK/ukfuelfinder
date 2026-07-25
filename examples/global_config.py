@@ -16,12 +16,11 @@ ukfuelfinder.set_global_backward_compatible(False)
 client1 = ukfuelfinder.FuelFinderClient(
     client_id="your_client_id",
     client_secret="your_client_secret",
-    backward_compatible=True  # This will be overridden by global config
+    backward_compatible=True,  # This will be overridden by global config
 )
 
 client2 = ukfuelfinder.FuelFinderClient(
-    client_id="your_client_id",
-    client_secret="your_client_secret"
+    client_id="your_client_id", client_secret="your_client_secret"
 )
 
 print(f"Client 1 backward_compatible: {client1.backward_compatible}")  # False
@@ -31,8 +30,7 @@ print(f"Client 2 backward_compatible: {client2.backward_compatible}")  # False
 ukfuelfinder.set_global_backward_compatible(True)
 
 client3 = ukfuelfinder.FuelFinderClient(
-    client_id="your_client_id",
-    client_secret="your_client_secret"
+    client_id="your_client_id", client_secret="your_client_secret"
 )
 
 print(f"Client 3 backward_compatible: {client3.backward_compatible}")  # True

@@ -19,18 +19,20 @@ Thank you for considering contributing to this project!
 ## Code Style
 
 - Follow PEP 8 style guidelines
-- Use Black for code formatting: `black ukfuelfinder tests`
-- Use type hints for all functions
+- Use Ruff for linting and formatting: `ruff check ukfuelfinder tests` and `ruff format ukfuelfinder tests`
+- Use type hints for all functions (checked with mypy)
 - Add docstrings to all public methods
 
 ## Testing
 
 - Write tests for all new features
-- Maintain >80% code coverage
+- Keep coverage at or above the enforced floor (currently 70%)
 - Run tests before submitting PR:
   ```bash
   pytest
   ```
+- Integration tests hit the real API and are skipped by default; run them with
+  credentials in `.env` via `pytest -m integration -o addopts=`
 
 ## Pull Request Process
 
@@ -39,9 +41,9 @@ Thank you for considering contributing to this project!
 3. Add tests
 4. Run code quality checks:
    ```bash
-   black ukfuelfinder tests
-   mypy ukfuelfinder
-   flake8 ukfuelfinder
+   ruff check ukfuelfinder tests
+   ruff format --check ukfuelfinder tests
+   mypy
    pytest
    ```
 5. Commit with clear messages

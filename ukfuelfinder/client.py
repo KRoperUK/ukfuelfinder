@@ -111,6 +111,31 @@ class FuelFinderClient:
         self.forecourt_service = ForecourtService(self.http_client, self.cache or ResponseCache())
 
     # Price methods
+    def _get_all_pfs_prices_raw(
+        self,
+        batch_number: Optional[int] = None,
+        effective_start_timestamp: Optional[str] = None,
+        **kwargs: Any,
+    ) -> List[PFS]:
+        """Fetch the raw PFS price list (no backward-compatibility wrapper)."""
+        try:
+            if batch_number is not None:
+                # Fetch specific batch
+                return self.price_service.get_all_pfs_prices(
+                    batch_number=batch_number,
+                    effective_start_timestamp=effective_start_timestamp,
+                    **kwargs,
+                )
+            # Fetch all batches automatically
+            return self.price_service.get_all_pfs_prices_paginated(
+                effective_start_timestamp=effective_start_timestamp, **kwargs
+            )
+        except BatchNotFoundError as e:
+            # Handle backward compatibility for batch errors
+            if self.backward_compatible:
+                raise InvalidBatchNumberError(f"Invalid batch number: {batch_number}") from e
+            raise
+
     def get_all_pfs_prices(
         self,
         batch_number: Optional[int] = None,
@@ -129,24 +154,11 @@ class FuelFinderClient:
         Returns:
             List of PFS with fuel prices
         """
-        try:
-            if batch_number is not None:
-                # Fetch specific batch
-                pfs_list = self.price_service.get_all_pfs_prices(
-                    batch_number=batch_number,
-                    effective_start_timestamp=effective_start_timestamp,
-                    **kwargs,
-                )
-            else:
-                # Fetch all batches automatically
-                pfs_list = self.price_service.get_all_pfs_prices_paginated(
-                    effective_start_timestamp=effective_start_timestamp, **kwargs
-                )
-        except BatchNotFoundError as e:
-            # Handle backward compatibility for batch errors
-            if self.backward_compatible:
-                raise InvalidBatchNumberError(f"Invalid batch number: {batch_number}") from e
-            raise
+        pfs_list = self._get_all_pfs_prices_raw(
+            batch_number=batch_number,
+            effective_start_timestamp=effective_start_timestamp,
+            **kwargs,
+        )
 
         # Apply backward compatibility wrapper if enabled
         if self.backward_compatible:
@@ -163,7 +175,7 @@ class FuelFinderClient:
         Returns:
             PFS object or None if not found
         """
-        all_pfs = self.get_all_pfs_prices()
+        all_pfs = self._get_all_pfs_prices_raw()
         pfs = self.price_service.get_pfs_by_node_id(node_id, all_pfs)
 
         # Apply backward compatibility wrapper if enabled
@@ -181,7 +193,7 @@ class FuelFinderClient:
         Returns:
             List of fuel prices
         """
-        all_pfs = self.get_all_pfs_prices()
+        all_pfs = self._get_all_pfs_prices_raw()
         return self.price_service.get_prices_by_fuel_type(fuel_type, all_pfs)
 
     def get_incremental_price_updates(
@@ -205,6 +217,25 @@ class FuelFinderClient:
         return pfs_list
 
     # Forecourt methods
+    def _get_all_pfs_info_raw(
+        self, batch_number: Optional[int] = None, **kwargs: Any
+    ) -> List[PFSInfo]:
+        """Fetch the raw PFS information list (no backward-compatibility wrapper)."""
+        try:
+            if batch_number is not None:
+                # Fetch specific batch
+                return self.forecourt_service.get_all_pfs(batch_number=batch_number, **kwargs)
+            # Fetch all batches automatically
+            all_pfs: List[PFSInfo] = []
+            for batch in self.forecourt_service.get_all_pfs_paginated(**kwargs):
+                all_pfs.extend(batch)
+            return all_pfs
+        except BatchNotFoundError as e:
+            # Handle backward compatibility for batch errors
+            if self.backward_compatible:
+                raise InvalidBatchNumberError(f"Invalid batch number: {batch_number}") from e
+            raise
+
     def get_all_pfs_info(
         self, batch_number: Optional[int] = None, **kwargs: Any
     ) -> Union[List[PFSInfo], List[BackwardCompatibleResponse[PFSInfo]]]:
@@ -219,21 +250,7 @@ class FuelFinderClient:
         Returns:
             List of PFS information
         """
-        try:
-            if batch_number is not None:
-                # Fetch specific batch
-                pfs_list = self.forecourt_service.get_all_pfs(batch_number=batch_number, **kwargs)
-            else:
-                # Fetch all batches automatically
-                all_pfs = []
-                for batch in self.forecourt_service.get_all_pfs_paginated(**kwargs):
-                    all_pfs.extend(batch)
-                pfs_list = all_pfs
-        except BatchNotFoundError as e:
-            # Handle backward compatibility for batch errors
-            if self.backward_compatible:
-                raise InvalidBatchNumberError(f"Invalid batch number: {batch_number}") from e
-            raise
+        pfs_list = self._get_all_pfs_info_raw(batch_number=batch_number, **kwargs)
 
         # Apply backward compatibility wrapper if enabled
         if self.backward_compatible:
@@ -274,7 +291,7 @@ class FuelFinderClient:
         Returns:
             PFSInfo object or None if not found
         """
-        all_pfs = self.get_all_pfs_info()
+        all_pfs = self._get_all_pfs_info_raw()
         pfs = self.forecourt_service.get_pfs_by_node_id(node_id, all_pfs)
 
         # Apply backward compatibility wrapper if enabled
